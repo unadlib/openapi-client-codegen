@@ -1,0 +1,21 @@
+{
+  "name": "openapi-client-codegen",
+  "version": "0.0.1",
+  "description": "Node.js library that generates Typescript function chaining clients based on the OpenAPI specification.",
+  "main": "index.js",
+  "scripts": {
+    "commit": "yarn git-cz",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "unadlib",
+  "license": "MIT",
+  "devDependencies": {
+    "commitizen": "^4.3.0",
+    "typescript": "^5.1.6"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
