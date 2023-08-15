@@ -1,15 +1,10 @@
-type Method =
-  | "get"
-  | "put"
-  | "post"
-  | "delete"
-  | "options"
-  | "head"
-  | "patch";
+import type { httpMethods } from './constant';
+
+type HttpMethods = httpMethods[number];
 
 type Split<S extends string, D extends string> = string extends S
   ? string[]
-  : S extends ""
+  : S extends ''
   ? []
   : S extends `${infer T}${D}${infer Rest}`
   ? [T, ...Split<Rest, D>]
@@ -17,7 +12,7 @@ type Split<S extends string, D extends string> = string extends S
 
 type BuildObjectPath<T extends string[], P> = T extends [
   infer First,
-  ...infer Rest
+  ...infer Rest,
 ]
   ? First extends `{${string}}`
     ? First extends string
@@ -32,7 +27,7 @@ type BuildObjectPath<T extends string[], P> = T extends [
     : P
   : P;
 
-type FunctionChaining<S extends string, P> = BuildObjectPath<Split<S, "/">, P>;
+type FunctionChaining<S extends string, P> = BuildObjectPath<Split<S, '/'>, P>;
 
 type RemoveLeadingSlash<T extends string> = T extends `/${infer Rest}`
   ? RemoveLeadingSlash<Rest>
@@ -75,7 +70,7 @@ type DeepMerge<T, U> = T extends (...args: any[]) => any
   : T extends object
   ? U extends object
     ? {
-        [K in keyof T | keyof U]: K extends Method
+        [K in keyof T | keyof U]: K extends HttpMethods
           ? K extends keyof U
             ? U[K]
             : K extends keyof T
@@ -92,5 +87,6 @@ type DeepMerge<T, U> = T extends (...args: any[]) => any
     : T
   : U;
 
-export type API<T extends {}> =
-  MergeDeepMultiple<UnionToTuple<ToFunctionChaining<T>>>;
+export type API<T extends {}> = MergeDeepMultiple<
+  UnionToTuple<ToFunctionChaining<T>>
+>;

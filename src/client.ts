@@ -1,9 +1,9 @@
-import { API } from "./type";
+import type { API } from './type';
 
-function createClientWithProxy(base = ".") {
+function createClientWithProxy(base = '.'): any {
   return new Proxy(() => {}, {
     get: (target, prop) => {
-      if (prop === "get") {
+      if (prop === 'get') {
         return () => {
           console.log(base);
         };
@@ -12,7 +12,7 @@ function createClientWithProxy(base = ".") {
     },
 
     apply: (target, thisArg, args) => {
-      const argString = args.length ? `/${args.join("~")}` : "/~";
+      const argString = args.length ? `/${args.join('~')}` : '/~';
       return createClientWithProxy(`${base}${argString}`);
     },
   });
