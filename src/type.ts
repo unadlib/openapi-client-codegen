@@ -100,7 +100,8 @@ type DeepTransform<T> = T extends (...args: any[]) => any
         : DeepTransform<T[K]>;
     };
 
-// TODO: parameters Exclude `path`
+type PathKey = 'path';
+
 type APIRequest<T> = (
   ...args: T extends {
     parameters: infer P;
@@ -110,19 +111,19 @@ type APIRequest<T> = (
       };
     };
   }
-    ? Exclude<keyof P, 'path'> extends never
+    ? Exclude<keyof P, PathKey> extends never
       ? [B]
       : ExcludeRequiredKeys<P> extends never
-      ? [B, P?]
-      : [B, P]
+      ? [B, ExcludeKey<P>?]
+      : [B, ExcludeKey<P>]
     : T extends {
         parameters: infer P;
       }
-    ? Exclude<keyof P, 'path'> extends never
+    ? Exclude<keyof P, PathKey> extends never
       ? []
       : ExcludeRequiredKeys<P> extends never
-      ? [P?]
-      : [P]
+      ? [ExcludeKey<P>?]
+      : [ExcludeKey<P>]
     : T extends {
         requestBody: {
           content?: {
@@ -146,10 +147,10 @@ type APIRequest<T> = (
     : any
 >;
 
-type ExcludeRequiredKeys<T> = Exclude<
-  keyof T,
-  | {
-      [K in keyof T]: undefined extends T[K] ? never : K;
-    }[keyof T]
-  | 'path'
->;
+type ExcludeRequiredKeys<T> = Exclude<keyof T, OptionalKeys<T> | PathKey>;
+
+type ExcludeKey<T> = Pick<T, Exclude<keyof T, PathKey>>;
+
+type OptionalKeys<T> = {
+  [K in keyof T]: undefined extends T[K] ? K : never;
+}[keyof T];
