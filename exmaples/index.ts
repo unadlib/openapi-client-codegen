@@ -3,6 +3,8 @@ import { paths } from './schema';
 
 const client = createClient<paths>();
 
-//
-client.pet().delete;
-client.store.order().get;
+const a = await client.pet().get();
+const b = await client.store.order().get();
+const c = await client.store.inventory.get();
+// const d = await client.pet.findByTags;
+// const e = await client.pet().post();

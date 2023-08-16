@@ -1,9 +1,10 @@
-import type { API } from './type';
+import { httpMethods } from './constant';
+import type { API, HttpMethod } from './type';
 
 function createClientWithProxy(base = '.'): any {
   return new Proxy(() => {}, {
-    get: (target, prop) => {
-      if (prop === 'get') {
+    get: (target, prop: HttpMethod) => {
+      if (httpMethods.includes(prop)) {
         return () => {
           console.log(base);
         };

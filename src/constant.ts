@@ -1,4 +1,4 @@
-export type httpMethods = [
+export const httpMethods = [
   'get',
   'put',
   'post',
@@ -7,4 +7,4 @@ export type httpMethods = [
   'head',
   'patch',
   'trace',
-];
+] as const;

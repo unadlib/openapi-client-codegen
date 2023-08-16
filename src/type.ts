@@ -1,6 +1,6 @@
 import type { httpMethods } from './constant';
 
-type HttpMethods = httpMethods[number];
+export type HttpMethod = (typeof httpMethods)[number];
 
 type Split<S extends string, D extends string> = string extends S
   ? string[]
@@ -10,6 +10,11 @@ type Split<S extends string, D extends string> = string extends S
   ? [T, ...Split<Rest, D>]
   : [S];
 
+/**
+ * the default value is `~`
+ */
+type Param = string;
+
 type BuildObjectPath<T extends string[], P> = T extends [
   infer First,
   ...infer Rest,
@@ -17,7 +22,7 @@ type BuildObjectPath<T extends string[], P> = T extends [
   ? First extends `{${string}}`
     ? First extends string
       ? Rest extends string[]
-        ? () => BuildObjectPath<Rest, P>
+        ? (param?: Param) => BuildObjectPath<Rest, P>
         : P
       : P
     : First extends string
@@ -70,18 +75,12 @@ type DeepMerge<T, U> = T extends (...args: any[]) => any
   : T extends object
   ? U extends object
     ? {
-        [K in keyof T | keyof U]: K extends HttpMethods
-          ? K extends keyof U
-            ? U[K]
-            : K extends keyof T
-            ? T[K]
-            : never
-          : K extends keyof T & keyof U
+        [K in keyof T | keyof U]: K extends keyof T & keyof U
           ? DeepMerge<T[K], U[K]>
           : K extends keyof T
           ? T[K]
           : K extends keyof U
-          ? U[K]
+          ? DeepTransform<U[K]>
           : never;
       }
     : T
@@ -89,4 +88,68 @@ type DeepMerge<T, U> = T extends (...args: any[]) => any
 
 export type API<T extends {}> = MergeDeepMultiple<
   UnionToTuple<ToFunctionChaining<T>>
+>;
+
+type DeepTransform<T> = T extends (...args: any[]) => any
+  ? (...args: Parameters<T>) => DeepTransform<ReturnType<T>>
+  : {
+      [K in keyof T]: T[K] extends (...args: any[]) => infer R
+        ? (...args: Parameters<T[K]>) => DeepTransform<R>
+        : K extends HttpMethod
+        ? APIRequest<T[K]>
+        : DeepTransform<T[K]>;
+    };
+
+// TODO: parameters Exclude `path`
+type APIRequest<T> = (
+  ...args: T extends {
+    parameters: infer P;
+    requestBody: {
+      content?: {
+        'application/json'?: infer B;
+      };
+    };
+  }
+    ? Exclude<keyof P, 'path'> extends never
+      ? [B]
+      : ExcludeRequiredKeys<P> extends never
+      ? [B, P?]
+      : [B, P]
+    : T extends {
+        parameters: infer P;
+      }
+    ? Exclude<keyof P, 'path'> extends never
+      ? []
+      : ExcludeRequiredKeys<P> extends never
+      ? [P?]
+      : [P]
+    : T extends {
+        requestBody: {
+          content?: {
+            'application/json'?: infer B;
+          };
+        };
+      }
+    ? [B]
+    : []
+) => Promise<
+  T extends {
+    responses: {
+      200: {
+        content: {
+          'application/json': infer R;
+        };
+      };
+    };
+  }
+    ? R
+    : any
+>;
+
+type ExcludeRequiredKeys<T> = Exclude<
+  keyof T,
+  | {
+      [K in keyof T]: undefined extends T[K] ? never : K;
+    }[keyof T]
+  | 'path'
 >;
