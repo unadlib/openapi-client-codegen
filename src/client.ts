@@ -6,7 +6,7 @@ function createClientWithProxy(base = '.'): any {
     get: (target, prop: HttpMethod) => {
       if (httpMethods.includes(prop)) {
         return () => {
-          console.log(base);
+          console.log(prop,base);
         };
       }
       return createClientWithProxy(`${base}/${String(prop)}`);
