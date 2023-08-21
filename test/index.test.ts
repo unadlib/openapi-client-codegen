@@ -2,7 +2,10 @@ import { createClient } from '../src';
 import { paths } from '../examples/schema';
 
 test('base', async () => {
-  const client = createClient<paths>();
+  const client = createClient<paths>({
+    baseUrl: 'http://localhost:8080',
+    request: console.log,
+  });
 
   const a = await client.pet().get();
   const b = await client.store.order().get();

@@ -247,6 +247,8 @@ export interface components {
   pathItems: never;
 }
 
+export type $defs = Record<string, never>;
+
 export type external = Record<string, never>;
 
 export interface operations {
@@ -470,7 +472,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            [key: string]: number | undefined;
+            [key: string]: number;
           };
         };
       };
