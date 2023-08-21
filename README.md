@@ -2,6 +2,12 @@
 
 Node.js library that generates Typescript function chaining  clients based on the OpenAPI specification.
 
+- Full type
+- Faster
+- Small
+- Powerful
+
+
 ## Usage
 
 ```sh
@@ -16,12 +22,13 @@ npx openapi-typescript examples/example.yaml -o examples/schema.d.ts
 
 - [ ] fetch client
 - [ ] Axios client
-- [ ] xhr  client
-- [ ] angular client
-- [ ] client by function chaining
+- [ ] XHR client
+- [ ] Angular client
+- [ ] Client by function chaining
 - [ ] schemas generator from local or remote schema
 - [ ] mock server
 - [ ] fetch mock 
+- [ ] runtime type checker
 
 ## Credits
 
