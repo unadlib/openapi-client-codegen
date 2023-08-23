@@ -1,6 +1,7 @@
 import { httpMethods } from './constant';
-import type { API, HttpMethod } from './type';
+import type { API, HttpMethod, RequestOptions } from './type';
 
+// TODO: support header and cookie, refer https://swagger.io/docs/specification/describing-parameters/
 function createClientWithProxy(options: {
   url: string;
   request: (...args: any[]) => any;
@@ -8,9 +9,12 @@ function createClientWithProxy(options: {
   return new Proxy(() => {}, {
     get: (target, prop: HttpMethod) => {
       if (httpMethods.includes(prop)) {
-        return () => {
-          // TODO: handle fetch query, body and fetch instance params
-          return options.request({method: prop, url: options.url});
+        return (requestOptions: RequestOptions) => {
+          return options.request({
+            ...requestOptions,
+            method: prop,
+            url: options.url,
+          });
         };
       }
       const url = `${options.url}/${String(prop)}`;
@@ -31,10 +35,10 @@ function createClientWithProxy(options: {
   });
 }
 
-export const createClient = <T extends {}>(options: {
+export const createClient = <T extends {}, P = RequestInit>(options: {
   baseUrl: string;
-  request: (...args: any[]) => any;
-}): API<T> => {
+  request: (options: RequestOptions<P>) => any;
+}): API<T, P> => {
   return createClientWithProxy({
     url: options.baseUrl,
     request: options.request,

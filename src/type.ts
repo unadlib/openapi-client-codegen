@@ -15,32 +15,36 @@ type Split<S extends string, D extends string> = string extends S
  */
 type Param = string;
 
-type BuildObjectPath<T extends string[], P> = T extends [
+type BuildObjectPath<T extends string[], P, O> = T extends [
   infer First,
   ...infer Rest,
 ]
   ? First extends `{${string}}`
     ? First extends string
       ? Rest extends string[]
-        ? (param?: Param) => BuildObjectPath<Rest, P>
+        ? (param?: Param) => BuildObjectPath<Rest, P, O>
         : P
       : P
     : First extends string
     ? Rest extends string[]
-      ? { [K in First]: BuildObjectPath<Rest, P> }
+      ? { [K in First]: BuildObjectPath<Rest, P, O> }
       : { [K in First]: P }
     : P
-  : DeepTransform<P>;
+  : DeepTransform<P, O>;
 
-type FunctionChaining<S extends string, P> = BuildObjectPath<Split<S, '/'>, P>;
+type FunctionChaining<S extends string, P, O> = BuildObjectPath<
+  Split<S, '/'>,
+  P,
+  O
+>;
 
 type RemoveLeadingSlash<T extends string> = T extends `/${infer Rest}`
   ? RemoveLeadingSlash<Rest>
   : T;
 
-type ToFunctionChaining<T extends {}> = {
+type ToFunctionChaining<T extends {}, O> = {
   [K in keyof T]: K extends string
-    ? FunctionChaining<RemoveLeadingSlash<K>, T[K]>
+    ? FunctionChaining<RemoveLeadingSlash<K>, T[K], O>
     : never;
 }[keyof T];
 
@@ -50,21 +54,21 @@ type UnionToIntersection<U> = (
   ? I
   : never;
 
-export type API<T extends {}> = UnionToIntersection<ToFunctionChaining<T>>;
+export type API<T extends {}, O> = UnionToIntersection<
+  ToFunctionChaining<T, O>
+>;
 
-type DeepTransform<T> = T extends (...args: any[]) => any
-  ? (...args: Parameters<T>) => DeepTransform<ReturnType<T>>
+type DeepTransform<T, O> = T extends (...args: any[]) => any
+  ? (...args: Parameters<T>) => DeepTransform<ReturnType<T>, O>
   : {
       [K in keyof T]: T[K] extends (...args: any[]) => infer R
-        ? (...args: Parameters<T[K]>) => DeepTransform<R>
+        ? (...args: Parameters<T[K]>) => DeepTransform<R, O>
         : K extends HttpMethod
-        ? APIRequest<T[K]>
-        : DeepTransform<T[K]>;
+        ? APIRequest<T[K], O>
+        : DeepTransform<T[K], O>;
     };
 
-type PathKey = 'path';
-
-type APIRequest<T> = (
+type APIRequest<T, O> = (
   ...args: T extends {
     parameters: infer P;
     requestBody: {
@@ -73,19 +77,19 @@ type APIRequest<T> = (
       };
     };
   }
-    ? Exclude<keyof P, PathKey> extends never
-      ? [B]
-      : ExcludeRequiredKeys<P> extends never
-      ? [B, ExcludeKey<P>?]
-      : [B, ExcludeKey<P>]
+    ? P extends { query: infer Q }
+      ? [{ body: B; query: Q; params?: O }]
+      : P extends { query?: infer Q }
+      ? [{ body: B; query?: Q; params?: O }]
+      : [{ body: B; params?: O }]
     : T extends {
         parameters: infer P;
       }
-    ? Exclude<keyof P, PathKey> extends never
-      ? []
-      : ExcludeRequiredKeys<P> extends never
-      ? [ExcludeKey<P>?]
-      : [ExcludeKey<P>]
+    ? P extends { query: infer Q }
+      ? [{ query: Q; params?: O }]
+      : P extends { query?: infer Q }
+      ? [{ query?: Q; params?: O }?]
+      : [{ params?: O }?]
     : T extends {
         requestBody: {
           content?: {
@@ -93,8 +97,8 @@ type APIRequest<T> = (
           };
         };
       }
-    ? [B]
-    : []
+    ? [{ body: B; params?: O }]
+    : [{ params?: O }?]
 ) => Promise<
   T extends {
     responses: {
@@ -109,10 +113,25 @@ type APIRequest<T> = (
     : any
 >;
 
-type ExcludeRequiredKeys<T> = Exclude<keyof T, OptionalKeys<T> | PathKey>;
-
-type ExcludeKey<T> = Pick<T, Exclude<keyof T, PathKey>>;
-
-type OptionalKeys<T> = {
-  [K in keyof T]: undefined extends T[K] ? K : never;
-}[keyof T];
+export type RequestOptions<O = any> = {
+  /**
+   * request URL
+   */
+  url: string;
+  /**
+   * request method
+   */
+  method: HttpMethod;
+  /**
+   * request query
+   */
+  query?: Record<string, any>;
+  /**
+   * request body
+   */
+  body?: any;
+  /**
+   * request params
+   */
+  params?: O;
+};
