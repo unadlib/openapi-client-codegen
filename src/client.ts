@@ -38,6 +38,7 @@ export const createClient = <T extends {}, P = RequestInit>(options: {
   baseUrl: string;
   request: (options: RequestOptions<P>) => any;
 }): API<T, P> => {
+  // TODO: implement a default request function
   return createClientWithProxy({
     url: options.baseUrl,
     request: options.request,
