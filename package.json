@@ -50,6 +50,7 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
+    "prettierPath": null,
     "globals": {
       "__DEV__": true
     }

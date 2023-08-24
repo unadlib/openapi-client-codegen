@@ -1,7 +1,6 @@
 import { httpMethods } from './constant';
 import type { API, HttpMethod, RequestOptions } from './type';
 
-// TODO: support header and cookie, refer https://swagger.io/docs/specification/describing-parameters/
 function createClientWithProxy(options: {
   url: string;
   request: (...args: any[]) => any;

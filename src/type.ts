@@ -77,19 +77,13 @@ type APIRequest<T, O> = (
       };
     };
   }
-    ? P extends { query: infer Q }
-      ? [{ body: B; query: Q; params?: O }]
-      : P extends { query?: infer Q }
-      ? [{ body: B; query?: Q; params?: O }]
-      : [{ body: B; params?: O }]
+    ? [{ body: B; params?: O } & ExcludePath<P>]
     : T extends {
         parameters: infer P;
       }
-    ? P extends { query: infer Q }
-      ? [{ query: Q; params?: O }]
-      : P extends { query?: infer Q }
-      ? [{ query?: Q; params?: O }?]
-      : [{ params?: O }?]
+    ? RequiredKeyof<ExcludePath<P>> extends never
+      ? [({ params?: O } & ExcludePath<P>)?]
+      : [{ params?: O } & ExcludePath<P>]
     : T extends {
         requestBody: {
           content?: {
@@ -135,3 +129,9 @@ export type RequestOptions<O = any> = {
    */
   params?: O;
 };
+
+type RequiredKeyof<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? never : K;
+}[keyof T];
+
+type ExcludePath<T> = Pick<T, Exclude<keyof T, 'path'>>;
