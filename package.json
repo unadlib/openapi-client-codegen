@@ -21,7 +21,11 @@
     "url": "https://github.com/unadlib/openapi-client-codegen/issues"
   },
   "homepage": "https://github.com/unadlib/openapi-client-codegen#readme",
-  "keywords": [],
+  "keywords": [
+    "openapi-client-codegen",
+    "openapi",
+    "openapi-client"
+  ],
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-node-resolve": "^15.1.0",

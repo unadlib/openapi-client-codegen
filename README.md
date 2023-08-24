@@ -1,5 +1,9 @@
 # openapi-client-codegen
 
+![Node CI](https://github.com/unadlib/openapi-client-codegen/workflows/Node%20CI/badge.svg)
+[![npm](https://img.shields.io/npm/v/mutative.svg)](https://www.npmjs.com/package/openapi-client-codegen)
+![license](https://img.shields.io/npm/l/openapi-client-codegen)
+
 Node.js library that generates Typescript function chaining clients based on the OpenAPI specification.
 
 - Full type
@@ -36,3 +40,7 @@ const result5 = await client.pet.post({
   },
 });
 ```
+
+## License
+
+openapi-client-codegen is [MIT licensed](https://github.com/unadlib/openapi-client-codegen/blob/main/LICENSE).
