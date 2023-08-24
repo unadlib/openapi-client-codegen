@@ -2,13 +2,14 @@ import { createClient } from '../src';
 import { paths } from '../examples/schema';
 
 test('base', async () => {
-  const client = createClient<paths>({
+  const client = createClient<paths, string>({
     baseUrl: 'http://localhost:8080',
     request: async (options) => {
       console.log(options);
       return options;
     },
   });
+
   const a = await client.pet().get();
   expect(a).toMatchInlineSnapshot(`
 {
@@ -16,6 +17,7 @@ test('base', async () => {
   "url": "http://localhost:8080/pet/~",
 }
 `);
+
   const b = await client.store.order().get();
   expect(b).toMatchInlineSnapshot(`
 {
@@ -23,6 +25,7 @@ test('base', async () => {
   "url": "http://localhost:8080/store/order/~",
 }
 `);
+
   const c = await client.store.inventory.get();
   expect(c).toMatchInlineSnapshot(`
 {
@@ -30,6 +33,7 @@ test('base', async () => {
   "url": "http://localhost:8080/store/inventory",
 }
 `);
+
   const d = await client.pet.findByTags.get();
   expect(d).toMatchInlineSnapshot(`
 {
@@ -37,6 +41,7 @@ test('base', async () => {
   "url": "http://localhost:8080/pet/findByTags",
 }
 `);
+
   const e = await client.pet().post();
   expect(e).toMatchInlineSnapshot(`
 {
@@ -44,6 +49,7 @@ test('base', async () => {
   "url": "http://localhost:8080/pet/~",
 }
 `);
+
   const f = await client.pet.post({
     body: {
       name: 's',
@@ -62,6 +68,7 @@ test('base', async () => {
   "url": "http://localhost:8080/pet",
 }
 `);
+
   const g = await client.pet('1').delete({
     header: {
       api_key: '1',

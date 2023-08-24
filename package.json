@@ -1,6 +1,6 @@
 {
   "name": "openapi-client-codegen",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node.js library that generates Typescript function chaining clients based on the OpenAPI specification.",
   "main": "lib/index.js",
   "unpkg": "dist/index.umd.js",
