@@ -1,7 +1,7 @@
 # openapi-client-codegen
 
 ![Node CI](https://github.com/unadlib/openapi-client-codegen/workflows/Node%20CI/badge.svg)
-[![npm](https://img.shields.io/npm/v/mutative.svg)](https://www.npmjs.com/package/openapi-client-codegen)
+[![npm](https://img.shields.io/npm/v/openapi-client-codegen.svg)](https://www.npmjs.com/package/openapi-client-codegen)
 ![license](https://img.shields.io/npm/l/openapi-client-codegen)
 
 Node.js library that generates Typescript function chaining clients based on the OpenAPI specification.
